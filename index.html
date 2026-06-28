@@ -1,0 +1,2070 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>AppHub — Luca's App Collection</title>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #09090b;
+      --surface:   #18181b;
+      --surface2:  #27272a;
+      --surface3:  #3f3f46;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --text:      #fafafa;
+      --muted:     #a1a1aa;
+      --dim:       #71717a;
+
+      --pink:      #ec4899;  --pink-d:    rgba(236,72,153,0.12);
+      --purple:    #8b5cf6;  --purple-d:  rgba(139,92,246,0.12);
+      --amber:     #f59e0b;  --amber-d:   rgba(245,158,11,0.12);
+      --cyan:      #06b6d4;  --cyan-d:    rgba(6,182,212,0.12);
+      --emerald:   #10b981;  --emerald-d: rgba(16,185,129,0.12);
+      --blue:      #3b82f6;  --blue-d:    rgba(59,130,246,0.12);
+
+      --sidebar-w: 240px;
+      --header-h:  56px;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      font-size: 14px;
+      line-height: 1.6;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    /* ── HEADER ── */
+    .header {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      height: var(--header-h);
+      background: rgba(9,9,11,0.85);
+      backdrop-filter: blur(20px);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center;
+      padding: 0 20px;
+      gap: 16px;
+    }
+    .header-logo {
+      display: flex; align-items: center; gap: 10px;
+      font-size: 16px; font-weight: 700; letter-spacing: -0.3px;
+      color: var(--text); text-decoration: none;
+    }
+    .header-logo-icon {
+      width: 32px; height: 32px; border-radius: 10px;
+      background: linear-gradient(135deg, #6366f1, #8b5cf6);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 16px;
+      box-shadow: 0 0 20px rgba(99,102,241,0.4);
+    }
+    .header-badge {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.8px;
+      color: var(--dim); text-transform: uppercase;
+      margin-left: auto;
+    }
+
+    /* ── LAYOUT ── */
+    .layout {
+      display: flex;
+      padding-top: var(--header-h);
+      min-height: 100vh;
+    }
+
+    /* ── SIDEBAR ── */
+    .sidebar {
+      position: fixed;
+      top: var(--header-h); left: 0;
+      width: var(--sidebar-w);
+      height: calc(100vh - var(--header-h));
+      background: var(--surface);
+      border-right: 1px solid var(--border);
+      overflow-y: auto;
+      padding: 20px 12px;
+      display: flex; flex-direction: column; gap: 4px;
+    }
+    .sidebar-section-label {
+      font-size: 10px; font-weight: 600; letter-spacing: 1px;
+      color: var(--dim); text-transform: uppercase;
+      padding: 8px 10px 6px;
+    }
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 9px 10px; border-radius: 8px;
+      cursor: pointer; transition: all 0.15s;
+      color: var(--muted); font-size: 13px; font-weight: 500;
+      border: 1px solid transparent;
+      user-select: none;
+    }
+    .nav-item:hover { background: var(--surface2); color: var(--text); }
+    .nav-item.active {
+      background: var(--surface2);
+      color: var(--text);
+      border-color: var(--border2);
+    }
+    .nav-icon {
+      width: 28px; height: 28px; border-radius: 7px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; flex-shrink: 0;
+    }
+    .nav-dot {
+      width: 6px; height: 6px; border-radius: 50%; margin-left: auto; flex-shrink: 0;
+    }
+
+    /* ── MAIN ── */
+    .main {
+      margin-left: var(--sidebar-w);
+      flex: 1;
+      min-height: 100vh;
+    }
+
+    /* ── PAGES ── */
+    .page { display: none; }
+    .page.active { display: block; }
+
+    /* ── OVERVIEW ── */
+    .overview { padding: 40px 40px 80px; }
+
+    .overview-hero {
+      text-align: center;
+      padding: 48px 20px 56px;
+    }
+    .overview-hero-eyebrow {
+      display: inline-block;
+      font-size: 11px; font-weight: 700; letter-spacing: 1.5px;
+      text-transform: uppercase; color: #6366f1;
+      background: rgba(99,102,241,0.1);
+      border: 1px solid rgba(99,102,241,0.25);
+      border-radius: 20px; padding: 4px 14px; margin-bottom: 16px;
+    }
+    .overview-hero h1 {
+      font-size: 42px; font-weight: 800; letter-spacing: -1.5px;
+      line-height: 1.15; margin-bottom: 14px;
+      background: linear-gradient(135deg, #fff 30%, #a1a1aa);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    }
+    .overview-hero p {
+      color: var(--muted); font-size: 16px; max-width: 480px; margin: 0 auto;
+    }
+
+    .app-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 16px;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    .app-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      cursor: pointer;
+      transition: all 0.2s;
+      position: relative;
+      overflow: hidden;
+    }
+    .app-card::before {
+      content: '';
+      position: absolute; inset: 0;
+      opacity: 0; transition: opacity 0.2s;
+      border-radius: 16px;
+    }
+    .app-card:hover { transform: translateY(-2px); border-color: var(--border2); }
+    .app-card:hover::before { opacity: 1; }
+
+    .app-card[data-accent="pink"]   { --acc: var(--pink);    --acc-d: var(--pink-d); }
+    .app-card[data-accent="purple"] { --acc: var(--purple);  --acc-d: var(--purple-d); }
+    .app-card[data-accent="amber"]  { --acc: var(--amber);   --acc-d: var(--amber-d); }
+    .app-card[data-accent="cyan"]   { --acc: var(--cyan);    --acc-d: var(--cyan-d); }
+    .app-card[data-accent="emerald"]{ --acc: var(--emerald); --acc-d: var(--emerald-d); }
+    .app-card[data-accent="blue"]   { --acc: var(--blue);    --acc-d: var(--blue-d); }
+
+    .app-card:hover { box-shadow: 0 0 0 1px var(--acc), 0 8px 32px rgba(0,0,0,0.4); }
+    .app-card:hover::before { background: var(--acc-d); }
+
+    .app-card-header { display: flex; align-items: flex-start; gap: 14px; margin-bottom: 14px; }
+
+    .app-icon {
+      width: 52px; height: 52px; border-radius: 14px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 24px; flex-shrink: 0;
+      position: relative;
+    }
+
+    .app-card[data-accent="pink"]    .app-icon { background: linear-gradient(135deg, #be185d, #ec4899); box-shadow: 0 4px 20px rgba(236,72,153,0.35); }
+    .app-card[data-accent="purple"]  .app-icon { background: linear-gradient(135deg, #6d28d9, #8b5cf6); box-shadow: 0 4px 20px rgba(139,92,246,0.35); }
+    .app-card[data-accent="amber"]   .app-icon { background: linear-gradient(135deg, #b45309, #f59e0b); box-shadow: 0 4px 20px rgba(245,158,11,0.35); }
+    .app-card[data-accent="cyan"]    .app-icon { background: linear-gradient(135deg, #0e7490, #06b6d4); box-shadow: 0 4px 20px rgba(6,182,212,0.35); }
+    .app-card[data-accent="emerald"] .app-icon { background: linear-gradient(135deg, #065f46, #10b981); box-shadow: 0 4px 20px rgba(16,185,129,0.35); }
+    .app-card[data-accent="blue"]    .app-icon { background: linear-gradient(135deg, #1d4ed8, #3b82f6); box-shadow: 0 4px 20px rgba(59,130,246,0.35); }
+
+    .app-card-title { font-size: 17px; font-weight: 700; letter-spacing: -0.3px; margin-bottom: 3px; }
+    .app-card-subtitle { font-size: 12px; color: var(--dim); }
+
+    .app-card-desc { color: var(--muted); font-size: 13px; line-height: 1.55; margin-bottom: 18px; }
+
+    .app-card-footer { display: flex; align-items: center; justify-content: space-between; }
+    .port-badges { display: flex; gap: 6px; flex-wrap: wrap; }
+    .port-badge {
+      font-size: 10px; font-weight: 600;
+      padding: 3px 8px; border-radius: 6px;
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border2);
+      font-family: ui-monospace, monospace;
+    }
+    .open-btn {
+      font-size: 12px; font-weight: 600; color: var(--acc);
+      display: flex; align-items: center; gap: 4px;
+      transition: gap 0.15s;
+    }
+    .app-card:hover .open-btn { gap: 8px; }
+    .live-link {
+      font-size: 11px; font-weight: 600;
+      color: var(--dim); text-decoration: none;
+      transition: color 0.15s; cursor: pointer;
+    }
+    .live-link:hover { color: var(--acc); }
+
+    .tag-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 16px; }
+    .tag {
+      font-size: 10px; font-weight: 600; letter-spacing: 0.5px;
+      padding: 3px 8px; border-radius: 6px;
+    }
+
+    /* ── APP DETAIL PAGE ── */
+    .app-detail { padding: 0 0 80px; }
+
+    .detail-hero {
+      padding: 40px 40px 36px;
+      border-bottom: 1px solid var(--border);
+      position: relative; overflow: hidden;
+    }
+    .detail-hero-bg {
+      position: absolute; inset: 0; opacity: 0.04;
+      background: radial-gradient(ellipse at 20% 50%, var(--acc) 0%, transparent 60%);
+      pointer-events: none;
+    }
+    .detail-hero-inner { display: flex; align-items: flex-start; gap: 20px; position: relative; }
+
+    .detail-icon {
+      width: 72px; height: 72px; border-radius: 20px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 34px; flex-shrink: 0;
+    }
+    .page[data-accent="pink"]    .detail-icon { background: linear-gradient(135deg, #be185d, #ec4899); box-shadow: 0 8px 32px rgba(236,72,153,0.4); }
+    .page[data-accent="purple"]  .detail-icon { background: linear-gradient(135deg, #6d28d9, #8b5cf6); box-shadow: 0 8px 32px rgba(139,92,246,0.4); }
+    .page[data-accent="amber"]   .detail-icon { background: linear-gradient(135deg, #b45309, #f59e0b); box-shadow: 0 8px 32px rgba(245,158,11,0.4); }
+    .page[data-accent="cyan"]    .detail-icon { background: linear-gradient(135deg, #0e7490, #06b6d4); box-shadow: 0 8px 32px rgba(6,182,212,0.4); }
+    .page[data-accent="emerald"] .detail-icon { background: linear-gradient(135deg, #065f46, #10b981); box-shadow: 0 8px 32px rgba(16,185,129,0.4); }
+    .page[data-accent="blue"]    .detail-icon { background: linear-gradient(135deg, #1d4ed8, #3b82f6); box-shadow: 0 8px 32px rgba(59,130,246,0.4); }
+
+    .page[data-accent="pink"]    { --acc: var(--pink);    --acc-d: var(--pink-d); }
+    .page[data-accent="purple"]  { --acc: var(--purple);  --acc-d: var(--purple-d); }
+    .page[data-accent="amber"]   { --acc: var(--amber);   --acc-d: var(--amber-d); }
+    .page[data-accent="cyan"]    { --acc: var(--cyan);    --acc-d: var(--cyan-d); }
+    .page[data-accent="emerald"] { --acc: var(--emerald); --acc-d: var(--emerald-d); }
+    .page[data-accent="blue"]    { --acc: var(--blue);    --acc-d: var(--blue-d); }
+
+    .detail-hero-text h1 {
+      font-size: 28px; font-weight: 800; letter-spacing: -0.8px;
+      margin-bottom: 4px;
+    }
+    .detail-hero-text .tagline { color: var(--muted); font-size: 14px; margin-bottom: 14px; }
+    .badge-row { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+    .tech-badge {
+      font-size: 11px; font-weight: 600;
+      padding: 4px 10px; border-radius: 8px;
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border2);
+    }
+    .status-badge {
+      font-size: 11px; font-weight: 700;
+      padding: 4px 10px; border-radius: 8px;
+      background: var(--acc-d); color: var(--acc);
+      border: 1px solid color-mix(in srgb, var(--acc) 30%, transparent);
+    }
+
+    /* ── CONTENT BODY ── */
+    .content-body {
+      display: grid;
+      grid-template-columns: 1fr 320px;
+      gap: 32px;
+      padding: 32px 40px;
+      align-items: start;
+    }
+
+    @media (max-width: 900px) {
+      .content-body { grid-template-columns: 1fr; }
+      .sidebar { display: none; }
+      .main { margin-left: 0; }
+    }
+
+    /* ── SECTIONS ── */
+    .section { margin-bottom: 36px; }
+    .section-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      color: var(--dim); text-transform: uppercase;
+      margin-bottom: 14px; display: flex; align-items: center; gap: 8px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── STEP LIST ── */
+    .step-list { display: flex; flex-direction: column; gap: 12px; }
+    .step {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .step-header {
+      display: flex; align-items: flex-start; gap: 14px;
+      padding: 16px 18px;
+    }
+    .step-num {
+      width: 26px; height: 26px; border-radius: 8px; flex-shrink: 0;
+      background: var(--acc-d); color: var(--acc);
+      border: 1px solid color-mix(in srgb, var(--acc) 30%, transparent);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 12px; font-weight: 700;
+    }
+    .step-info { flex: 1; }
+    .step-title { font-weight: 700; font-size: 14px; margin-bottom: 2px; }
+    .step-desc { color: var(--muted); font-size: 13px; }
+    .step-code {
+      background: #030712;
+      border-top: 1px solid var(--border);
+      padding: 14px 18px;
+      font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+      font-size: 12px;
+      color: #a5f3fc;
+      line-height: 1.7;
+      position: relative;
+      overflow-x: auto;
+      white-space: pre;
+    }
+    .copy-btn {
+      position: absolute; top: 10px; right: 10px;
+      background: var(--surface2); color: var(--muted);
+      border: 1px solid var(--border2); border-radius: 6px;
+      font-size: 10px; font-weight: 600; padding: 4px 8px;
+      cursor: pointer; transition: all 0.15s; white-space: nowrap;
+    }
+    .copy-btn:hover { background: var(--surface3); color: var(--text); }
+    .copy-btn.copied { color: #4ade80; border-color: rgba(74,222,128,0.3); }
+
+    /* ── FEATURE LIST ── */
+    .feature-list { display: flex; flex-direction: column; gap: 10px; }
+    .feature-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 14px 16px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+    }
+    .feature-icon {
+      width: 30px; height: 30px; border-radius: 8px; flex-shrink: 0;
+      background: var(--acc-d); color: var(--acc);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px;
+    }
+    .feature-text strong { display: block; font-size: 13px; font-weight: 600; margin-bottom: 2px; }
+    .feature-text span { color: var(--muted); font-size: 12px; }
+
+    /* ── SIDEBAR WIDGETS ── */
+    .widget {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 18px;
+      margin-bottom: 16px;
+    }
+    .widget-title {
+      font-size: 11px; font-weight: 700; letter-spacing: 1px;
+      color: var(--dim); text-transform: uppercase; margin-bottom: 12px;
+    }
+    .info-row {
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 7px 0; border-bottom: 1px solid var(--border);
+    }
+    .info-row:last-child { border-bottom: none; padding-bottom: 0; }
+    .info-label { color: var(--muted); font-size: 12px; }
+    .info-value {
+      font-size: 12px; font-weight: 600;
+      font-family: ui-monospace, monospace;
+    }
+    .info-value a { color: var(--acc); text-decoration: none; }
+    .info-value a:hover { text-decoration: underline; }
+
+    /* ── DEMO TABLE ── */
+    .demo-table { width: 100%; border-collapse: collapse; font-size: 12px; }
+    .demo-table th {
+      text-align: left; color: var(--dim); font-weight: 600;
+      padding: 6px 10px; font-size: 10px; letter-spacing: 0.5px;
+      text-transform: uppercase; border-bottom: 1px solid var(--border);
+    }
+    .demo-table td {
+      padding: 8px 10px; border-bottom: 1px solid var(--border);
+      color: var(--muted); vertical-align: top;
+    }
+    .demo-table tr:last-child td { border-bottom: none; }
+    .demo-table td:first-child { color: var(--text); font-weight: 500; }
+    .demo-table code {
+      font-family: ui-monospace, monospace;
+      background: var(--surface2); padding: 2px 6px; border-radius: 4px; font-size: 11px;
+    }
+
+    /* ── ROLE BADGE ── */
+    .role-badge {
+      display: inline-block;
+      font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 5px;
+    }
+    .role-owner   { background: rgba(245,158,11,0.15); color: #f59e0b; }
+    .role-admin   { background: rgba(139,92,246,0.15); color: #8b5cf6; }
+    .role-member  { background: rgba(99,102,241,0.15); color: #818cf8; }
+    .role-broker  { background: rgba(236,72,153,0.15); color: #ec4899; }
+    .role-client  { background: rgba(6,182,212,0.15);  color: #06b6d4; }
+
+    /* ── ARCH TREE ── */
+    .arch-tree {
+      background: #030712;
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px 16px;
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.7;
+      overflow-x: auto;
+    }
+    .arch-tree .dir { color: #93c5fd; }
+    .arch-tree .file { color: var(--muted); }
+    .arch-tree .comment { color: var(--surface3); }
+
+    /* ── INLINE CODE ── */
+    code {
+      font-family: ui-monospace, monospace;
+      font-size: 12px;
+      background: var(--surface2);
+      padding: 2px 6px; border-radius: 5px;
+      color: #a5f3fc;
+    }
+
+    /* ── SCROLLBAR ── */
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: var(--surface3); border-radius: 3px; }
+
+    /* ── ANIMATIONS ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(12px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+    .page.active .app-card,
+    .page.active .step,
+    .page.active .feature-item,
+    .page.active .widget {
+      animation: fadeUp 0.3s ease both;
+    }
+    .app-card:nth-child(1) { animation-delay: 0.03s; }
+    .app-card:nth-child(2) { animation-delay: 0.06s; }
+    .app-card:nth-child(3) { animation-delay: 0.09s; }
+    .app-card:nth-child(4) { animation-delay: 0.12s; }
+    .app-card:nth-child(5) { animation-delay: 0.15s; }
+
+    .step:nth-child(1) { animation-delay: 0.05s; }
+    .step:nth-child(2) { animation-delay: 0.1s; }
+    .step:nth-child(3) { animation-delay: 0.15s; }
+    .step:nth-child(4) { animation-delay: 0.2s; }
+    .step:nth-child(5) { animation-delay: 0.25s; }
+    .step:nth-child(6) { animation-delay: 0.3s; }
+
+    /* ── NOTE BOX ── */
+    .note {
+      display: flex; gap: 12px;
+      padding: 14px 16px;
+      border-radius: 10px;
+      margin-bottom: 16px;
+      font-size: 13px; line-height: 1.5;
+    }
+    .note-info    { background: rgba(99,102,241,0.08); border: 1px solid rgba(99,102,241,0.2); color: #818cf8; }
+    .note-warning { background: rgba(245,158,11,0.08); border: 1px solid rgba(245,158,11,0.2); color: #f59e0b; }
+    .note-icon { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+    .note-text { color: var(--muted); }
+    .note-text strong { color: var(--text); }
+
+    /* ── PORT SUMMARY ── */
+    .port-summary-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 8px;
+      margin-top: 8px;
+    }
+    .port-entry {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 10px 12px;
+    }
+    .port-entry-label { font-size: 10px; color: var(--dim); font-weight: 600; letter-spacing: 0.5px; margin-bottom: 3px; text-transform: uppercase; }
+    .port-entry-value { font-size: 12px; font-weight: 700; font-family: ui-monospace, monospace; color: var(--acc); }
+
+    /* ── GREEN INLINE ── */
+    .c-green  { color: #4ade80; }
+    .c-blue   { color: #60a5fa; }
+    .c-yellow { color: #fbbf24; }
+    .c-gray   { color: var(--surface3); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header class="header">
+  <a class="header-logo" href="#" onclick="navigate('overview')">
+    <div class="header-logo-icon">🗂️</div>
+    AppHub
+  </a>
+  <span class="header-badge">6 Apps · Luca's Collection</span>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+
+  <!-- SIDEBAR -->
+  <nav class="sidebar">
+    <div class="sidebar-section-label">Navigation</div>
+    <div class="nav-item active" id="nav-overview" onclick="navigate('overview')">
+      <div class="nav-icon" style="background:rgba(99,102,241,0.15);font-size:15px;">🏠</div>
+      Overview
+    </div>
+
+    <div class="sidebar-section-label" style="margin-top:8px;">Apps</div>
+
+    <div class="nav-item" id="nav-maklermatch" onclick="navigate('maklermatch')">
+      <div class="nav-icon" style="background:var(--pink-d);">💘</div>
+      MaklerMatch
+      <div class="nav-dot" style="background:var(--pink);"></div>
+    </div>
+
+    <div class="nav-item" id="nav-votesemble" onclick="navigate('votesemble')">
+      <div class="nav-icon" style="background:var(--purple-d);">🗳️</div>
+      Votesemble
+      <div class="nav-dot" style="background:var(--purple);"></div>
+    </div>
+
+    <div class="nav-item" id="nav-taxes" onclick="navigate('taxes')">
+      <div class="nav-icon" style="background:var(--amber-d);">💶</div>
+      Steuer-App
+      <div class="nav-dot" style="background:var(--amber);"></div>
+    </div>
+
+    <div class="nav-item" id="nav-npl" onclick="navigate('npl')">
+      <div class="nav-icon" style="background:var(--cyan-d);">🌐</div>
+      NPL Network
+      <div class="nav-dot" style="background:var(--cyan);"></div>
+    </div>
+
+    <div class="nav-item" id="nav-investments" onclick="navigate('investments')">
+      <div class="nav-icon" style="background:var(--emerald-d);">📈</div>
+      Market Analyzer
+      <div class="nav-dot" style="background:var(--emerald);"></div>
+    </div>
+
+    <div class="nav-item" id="nav-aicam" onclick="navigate('aicam')">
+      <div class="nav-icon" style="background:var(--blue-d);">🎥</div>
+      AI Cam
+      <div class="nav-dot" style="background:var(--blue);"></div>
+    </div>
+
+    <div class="sidebar-section-label" style="margin-top:8px;">Port Map</div>
+    <div style="padding: 4px 10px;">
+      <div style="font-size:11px;color:var(--dim);line-height:2;font-family:ui-monospace,monospace;">
+        <div><span style="color:var(--pink)">●</span> MM &nbsp;→ :5173 / :8020</div>
+        <div><span style="color:var(--purple)">●</span> Vote → :5174 / :8021</div>
+        <div><span style="color:var(--amber)">●</span> Tax &nbsp;→ :5175 / :8022</div>
+        <div><span style="color:var(--cyan)">●</span> NPL &nbsp;→ :8023</div>
+        <div><span style="color:var(--emerald)">●</span> Mkt &nbsp;→ :5176</div>
+        <div><span style="color:var(--blue)">●</span> Cam &nbsp;→ desktop</div>
+      </div>
+    </div>
+
+    <div class="sidebar-section-label" style="margin-top:8px;">Quick Start</div>
+    <div style="padding: 4px 10px 12px;">
+      <div style="font-size:11px;color:var(--dim);margin-bottom:6px;">Start all apps at once:</div>
+      <div style="font-family:ui-monospace,monospace;font-size:11px;color:#a5f3fc;background:#030712;border:1px solid var(--border);border-radius:7px;padding:8px 10px;line-height:1.6;cursor:pointer;" onclick="navigator.clipboard.writeText('cd ~/apps && bash start-all.sh')" title="Click to copy">bash start-all.sh</div>
+    </div>
+  </nav>
+
+  <!-- MAIN -->
+  <main class="main">
+
+    <!-- ═══════════ OVERVIEW PAGE ═══════════ -->
+    <div class="page active" id="page-overview">
+      <div class="overview">
+        <div class="overview-hero">
+          <div class="overview-hero-eyebrow">Local App Collection</div>
+          <h1>Your Apps,<br>All in One Place</h1>
+          <p>Six full-stack applications — each documented with start instructions, ports, and demo accounts.</p>
+        </div>
+
+        <!-- START ALL BANNER -->
+        <div style="max-width:1100px;margin:0 auto 28px;">
+          <div class="step" style="border-color:rgba(99,102,241,0.3);background:rgba(99,102,241,0.05);">
+            <div class="step-header">
+              <div class="step-num" style="background:rgba(99,102,241,0.15);color:#818cf8;border-color:rgba(99,102,241,0.3);font-size:14px;">⚡</div>
+              <div class="step-info">
+                <div class="step-title">Start all apps at once</div>
+                <div class="step-desc">One command launches all 5 apps — 3 backends + 5 frontends. Press Ctrl+C to stop everything.</div>
+              </div>
+            </div>
+            <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps &amp;&amp; bash start-all.sh</div>
+          </div>
+        </div>
+
+        <div class="app-grid">
+
+          <!-- MaklerMatch -->
+          <div class="app-card" data-accent="pink" onclick="navigate('maklermatch')">
+            <div class="app-card-header">
+              <div class="app-icon">💘</div>
+              <div>
+                <div class="app-card-title">MaklerMatch</div>
+                <div class="app-card-subtitle">Financial Broker Matching</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(236,72,153,0.1);color:#ec4899;">FastAPI</span>
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#60a5fa;">React 18</span>
+              <span class="tag" style="background:rgba(99,102,241,0.1);color:#818cf8;">TypeScript</span>
+            </div>
+            <p class="app-card-desc">Tinder-like matching platform for financial and insurance brokers. Clients swipe on broker profiles — right swipe leads to a match and chat.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:5173</span>
+                <span class="port-badge">:8020</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <a class="live-link" onclick="openApp('maklermatch', event)">↗ Live</a>
+                <div class="open-btn">Details →</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Votesemble -->
+          <div class="app-card" data-accent="purple" onclick="navigate('votesemble')">
+            <div class="app-card-header">
+              <div class="app-icon">🗳️</div>
+              <div>
+                <div class="app-card-title">Votesemble</div>
+                <div class="app-card-subtitle">Reliable Voting Platform</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">FastAPI</span>
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#60a5fa;">React 18</span>
+              <span class="tag" style="background:rgba(99,102,241,0.1);color:#818cf8;">Hash-Chain</span>
+            </div>
+            <p class="app-card-desc">Tamper-evident voting for groups, associations, and companies. Six tally methods, three assurance levels, ballot receipts, and audit export.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:5174</span>
+                <span class="port-badge">:8021</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <a class="live-link" onclick="openApp('votesemble', event)">↗ Live</a>
+                <div class="open-btn">Details →</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Taxes -->
+          <div class="app-card" data-accent="amber" onclick="navigate('taxes')">
+            <div class="app-card-header">
+              <div class="app-icon">💶</div>
+              <div>
+                <div class="app-card-title">Steuer-App</div>
+                <div class="app-card-subtitle">Tax Management Web App</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(245,158,11,0.1);color:#f59e0b;">FastAPI</span>
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#60a5fa;">React</span>
+              <span class="tag" style="background:rgba(99,102,241,0.1);color:#818cf8;">SQLite</span>
+            </div>
+            <p class="app-card-desc">Track income and expenses, manage tax categories, upload receipts, and export CSV reports. One-command start with the included shell script.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:5175</span>
+                <span class="port-badge">:8022</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <a class="live-link" onclick="openApp('taxes', event)">↗ Live</a>
+                <div class="open-btn">Details →</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- NPL -->
+          <div class="app-card" data-accent="cyan" onclick="navigate('npl')">
+            <div class="app-card-header">
+              <div class="app-icon">🌐</div>
+              <div>
+                <div class="app-card-title">NPL Network</div>
+                <div class="app-card-subtitle">Personal Contact & Relationship API</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(6,182,212,0.1);color:#06b6d4;">FastAPI</span>
+              <span class="tag" style="background:rgba(99,102,241,0.1);color:#818cf8;">Async SQLAlchemy</span>
+              <span class="tag" style="background:rgba(16,185,129,0.1);color:#10b981;">D3 Graph</span>
+            </div>
+            <p class="app-card-desc">Self-hosted contact management API. Track people, relationships, interaction history, and visualize your network as a D3.js graph. Raspberry Pi ready.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:8023</span>
+              </div>
+              <div class="open-btn">View details →</div>
+            </div>
+          </div>
+
+          <!-- AI Cam -->
+          <div class="app-card" data-accent="blue" onclick="navigate('aicam')">
+            <div class="app-card-header">
+              <div class="app-icon">🎥</div>
+              <div>
+                <div class="app-card-title">AI Cam</div>
+                <div class="app-card-subtitle">Real-time Object Detection & Gesture Recognition</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#3b82f6;">YOLOv8</span>
+              <span class="tag" style="background:rgba(99,102,241,0.1);color:#818cf8;">MediaPipe</span>
+              <span class="tag" style="background:rgba(16,185,129,0.1);color:#10b981;">OpenCV</span>
+            </div>
+            <p class="app-card-desc">Live camera feed with AI overlays — YOLO object detection and MediaPipe hand gesture recognition. Runs fully local, no API key needed.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">desktop</span>
+              </div>
+              <div class="open-btn">View details →</div>
+            </div>
+          </div>
+
+          <!-- Market Analyzer -->
+          <div class="app-card" data-accent="emerald" onclick="navigate('investments')">
+            <div class="app-card-header">
+              <div class="app-icon">📈</div>
+              <div>
+                <div class="app-card-title">Market Analyzer</div>
+                <div class="app-card-subtitle">AI Investment Planner</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(16,185,129,0.1);color:#10b981;">Ollama LLM</span>
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#60a5fa;">React</span>
+              <span class="tag" style="background:rgba(245,158,11,0.1);color:#f59e0b;">Free Forever</span>
+            </div>
+            <p class="app-card-desc">Pick a strategy, get a real portfolio plan. Runs 100% locally with Ollama — no API key, no cloud, no cost. Live prices via CoinGecko, Alpha Vantage & FRED.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:5176</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <a class="live-link" onclick="openApp('investments', event)">↗ Live</a>
+                <div class="open-btn">Details →</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ MAKLERMATCH PAGE ═══════════ -->
+    <div class="page" id="page-maklermatch" data-accent="pink">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">💘</div>
+            <div class="detail-hero-text">
+              <h1>MaklerMatch</h1>
+              <p class="tagline">Tinder-like matching platform for financial and insurance brokers</p>
+              <div class="badge-row">
+                <span class="status-badge">Frontend :5173</span>
+                <span class="status-badge">Backend :8020</span>
+                <span class="tech-badge">FastAPI</span>
+                <span class="tech-badge">React 18</span>
+                <span class="tech-badge">TypeScript</span>
+                <span class="tech-badge">Zustand</span>
+                <span class="tech-badge">SQLite</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">⚡</span>
+                <span class="note-text"><strong>One-command start:</strong> After the first-time setup below, use <code>start.sh</code> to launch both servers at once.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">→</div>
+                    <div class="step-info">
+                      <div class="step-title">Subsequent runs — one-command start</div>
+                      <div class="step-desc">Starts backend on :8020 and frontend on :5173 in one go</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/maklermatch
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">First-time: set up the backend</div>
+                      <div class="step-desc">Create a virtual environment, install dependencies, and configure environment variables</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># From the project root</span>
+cd ~/apps/maklermatch/backend
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+cp .env.example .env</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Initialize the database & seed demo data</div>
+                      <div class="step-desc">Runs Alembic migrations and creates demo broker and client accounts</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>alembic upgrade head
+python seed.py</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the backend server</div>
+                      <div class="step-desc">FastAPI with hot-reload on port 8020 — keep this terminal open</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>uvicorn app.main:app --reload --port 8020</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the frontend</div>
+                      <div class="step-desc">Open a new terminal — Vite dev server on port 5173</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/maklermatch/frontend
+npm install
+cp .env.example .env
+npm run dev</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Features</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">👤</div>
+                  <div class="feature-text">
+                    <strong>Broker Profiles</strong>
+                    <span>Upload photos, pitch video (file or YouTube/Vimeo URL), certifications and specializations</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔥</div>
+                  <div class="feature-text">
+                    <strong>Smart Feed with Ranking</strong>
+                    <span>Score = 0.6 × tag overlap + 0.25 × rating + 0.15 × recency. Hard filters for region and language</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">💬</div>
+                  <div class="feature-text">
+                    <strong>WebSocket Chat</strong>
+                    <span>Real-time messaging on match. JWT auth via query param for WebSocket handshake</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">⚖️</div>
+                  <div class="feature-text">
+                    <strong>DSGVO Compliant</strong>
+                    <span>DELETE /users/me cascades to all profiles, swipes, matches, messages, reviews and uploads</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🌟</div>
+                  <div class="feature-text">
+                    <strong>Reviews & Ratings</strong>
+                    <span>Clients can rate and review matched brokers. Ratings feed back into the ranking algorithm</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Demo Accounts</div>
+              <div class="widget" style="padding:0;overflow:hidden;">
+                <table class="demo-table">
+                  <thead>
+                    <tr>
+                      <th>Role</th>
+                      <th>E-Mail</th>
+                      <th>Password</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr>
+                      <td><span class="role-badge role-client">Client</span></td>
+                      <td><code>client1@maklermatch-demo.com</code></td>
+                      <td><code>Demo1234!</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="role-badge role-client">Client</span></td>
+                      <td><code>client2@maklermatch-demo.com</code></td>
+                      <td><code>Demo1234!</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="role-badge role-broker">Broker</span></td>
+                      <td><code>broker1@maklermatch-demo.com</code></td>
+                      <td><code>Demo1234!</code></td>
+                    </tr>
+                    <tr>
+                      <td><span class="role-badge role-broker">Broker</span></td>
+                      <td><code>broker2–8@demo.test</code></td>
+                      <td><code>Demo1234!</code></td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Architecture</div>
+              <div class="arch-tree"><span class="dir">maklermatch/</span>
+├── <span class="dir">backend/</span>          <span class="comment"># FastAPI + SQLAlchemy + SQLite</span>
+│   ├── <span class="dir">app/</span>
+│   │   ├── <span class="file">main.py</span>
+│   │   ├── <span class="file">models.py</span>
+│   │   ├── <span class="dir">routers/</span>       <span class="comment"># auth, users, brokers, matches, chat</span>
+│   │   ├── <span class="dir">schemas/</span>
+│   │   ├── <span class="dir">services/</span>
+│   │   └── <span class="file">storage.py</span>    <span class="comment"># StorageService (save/get_url/delete)</span>
+│   ├── <span class="dir">alembic/</span>          <span class="comment"># DB migrations</span>
+│   └── <span class="file">seed.py</span>
+└── <span class="dir">frontend/</span>         <span class="comment"># React 18 + Vite + TypeScript</span>
+    └── <span class="dir">src/</span>
+        ├── <span class="dir">pages/</span>
+        ├── <span class="dir">components/</span>
+        ├── <span class="dir">hooks/</span>
+        ├── <span class="dir">stores/</span>        <span class="comment"># Zustand</span>
+        └── <span class="dir">lib/</span>           <span class="comment"># axios client + API helpers</span></div>
+            </div>
+          </div>
+
+          <!-- SIDEBAR -->
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row">
+                <span class="info-label">Live</span>
+                <span class="info-value"><a class="env-link" data-app="maklermatch" target="_blank">laholder.com ↗</a></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">App</span>
+                <span class="info-value"><a href="http://localhost:5173" target="_blank">localhost:5173</a></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">API</span>
+                <span class="info-value"><a href="http://localhost:8020" target="_blank">localhost:8020</a></span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">API Docs</span>
+                <span class="info-value"><a href="http://localhost:8020/docs" target="_blank">/docs</a></span>
+              </div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">FastAPI + Uvicorn</span></div>
+              <div class="info-row"><span class="info-label">Frontend</span><span class="info-value">React 18 + Vite</span></div>
+              <div class="info-row"><span class="info-label">Database</span><span class="info-value">SQLite (dev)</span></div>
+              <div class="info-row"><span class="info-label">Auth</span><span class="info-value">JWT (RS256)</span></div>
+              <div class="info-row"><span class="info-label">State</span><span class="info-value">Zustand</span></div>
+              <div class="info-row"><span class="info-label">Realtime</span><span class="info-value">WebSocket</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Running Tests</div>
+              <div class="step-code" style="border-radius:8px;font-size:11px;"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Backend</span>
+cd backend && source .venv/bin/activate
+pytest -v
+
+<span class="c-gray"># Frontend</span>
+cd frontend && npm test</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ VOTESEMBLE PAGE ═══════════ -->
+    <div class="page" id="page-votesemble" data-accent="purple">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">🗳️</div>
+            <div class="detail-hero-text">
+              <h1>Votesemble</h1>
+              <p class="tagline">Tamper-evident voting platform for groups, associations, and companies</p>
+              <div class="badge-row">
+                <span class="status-badge">Frontend :5174</span>
+                <span class="status-badge">Backend :8021</span>
+                <span class="tech-badge">FastAPI</span>
+                <span class="tech-badge">React 18</span>
+                <span class="tech-badge">SHA-256 Hash-Chain</span>
+                <span class="tech-badge">Pydantic v2</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">⚡</span>
+                <span class="note-text"><strong>One-command start:</strong> After the first-time setup below, use <code>start.sh</code> to launch both servers at once.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">→</div>
+                    <div class="step-info">
+                      <div class="step-title">Subsequent runs — one-command start</div>
+                      <div class="step-desc">Starts backend on :8021 and frontend on :5174 in one go</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/votesemble
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">First-time: set up the backend</div>
+                      <div class="step-desc">Create venv, install deps, and copy env config</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/votesemble/backend
+cp .env.example .env
+python3.12 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the backend on port 8021</div>
+                      <div class="step-desc">Uvicorn with auto-reload — keep this terminal open</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>uvicorn app.main:app --reload --port 8021</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Seed demo data (optional)</div>
+                      <div class="step-desc">Creates organizations at L1, L2, and L3 assurance with demo user accounts</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>python seed.py</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the frontend on port 5174</div>
+                      <div class="step-desc">Open a new terminal — Vite proxies API calls to :8021</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/votesemble/frontend
+cp .env.example .env
+npm install
+npm run dev</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Assurance Levels</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">🟢</div>
+                  <div class="feature-text">
+                    <strong>L1 Casual</strong>
+                    <span>Simple majority or approval vote. No email verification required. Quick polls for informal groups.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔵</div>
+                  <div class="feature-text">
+                    <strong>L2 Verified</strong>
+                    <span>Email verification, secret ballot (optional), quorum + threshold, eligibility snapshot, hash-chain ledger, ballot receipts.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🟣</div>
+                  <div class="feature-text">
+                    <strong>L3 High-Assurance</strong>
+                    <span>All L2 features + weighted and quadratic voting, liquid delegation (depth 10), observer role, 2FA (TOTP), audit export.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Tally Methods</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">✅</div>
+                  <div class="feature-text"><strong>Simple Majority</strong><span>One option, most votes wins. Tie → no winner declared.</span></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">☑️</div>
+                  <div class="feature-text"><strong>Approval</strong><span>Check any number of options — highest approval count wins.</span></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔢</div>
+                  <div class="feature-text"><strong>Ranked Choice (IRV)</strong><span>Instant-runoff elimination rounds. Deterministic tie-break.</span></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">⭐</div>
+                  <div class="feature-text"><strong>Score</strong><span>Rate each option 0–5. Highest average wins.</span></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">⚖️</div>
+                  <div class="feature-text"><strong>Weighted</strong><span>Votes scaled by <code>voting_weight</code> (e.g. share count).</span></div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔬</div>
+                  <div class="feature-text"><strong>Quadratic</strong><span>Credit budget — cost = votes². Spend across multiple options.</span></div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Demo Accounts</div>
+              <div class="widget" style="padding:0;overflow:hidden;">
+                <table class="demo-table">
+                  <thead>
+                    <tr><th>Email</th><th>Password</th><th>Role</th><th>Org</th></tr>
+                  </thead>
+                  <tbody>
+                    <tr><td><code>owner@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-owner">Owner</span></td><td>All orgs</td></tr>
+                    <tr><td><code>alice@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-member">Member</span></td><td>L1 Freundeskreis</td></tr>
+                    <tr><td><code>bob@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-member">Member</span></td><td>L1 Freundeskreis</td></tr>
+                    <tr><td><code>carol@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-admin">Admin</span></td><td>L2 Gesellschaft</td></tr>
+                    <tr><td><code>dave@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-member">Member</span></td><td>L2 Gesellschaft</td></tr>
+                    <tr><td><code>eve@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-member">Member</span></td><td>L3 Unternehmen (0.4×)</td></tr>
+                    <tr><td><code>frank@demo.test</code></td><td><code>Demo1234!</code></td><td><span class="role-badge role-member">Member</span></td><td>L3 Unternehmen (0.6×)</td></tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row"><span class="info-label">Live</span><span class="info-value"><a class="env-link" data-app="votesemble" target="_blank">laholder.com ↗</a></span></div>
+              <div class="info-row"><span class="info-label">App</span><span class="info-value"><a href="http://localhost:5174" target="_blank">localhost:5174</a></span></div>
+              <div class="info-row"><span class="info-label">API</span><span class="info-value"><a href="http://localhost:8021" target="_blank">localhost:8021</a></span></div>
+              <div class="info-row"><span class="info-label">API Docs</span><span class="info-value"><a href="http://localhost:8021/docs" target="_blank">/docs</a></span></div>
+              <div class="info-row"><span class="info-label">Health</span><span class="info-value"><a href="http://localhost:8021/health" target="_blank">/health</a></span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">FastAPI + Uvicorn</span></div>
+              <div class="info-row"><span class="info-label">Frontend</span><span class="info-value">React 18 + Vite</span></div>
+              <div class="info-row"><span class="info-label">Database</span><span class="info-value">SQLite (dev)</span></div>
+              <div class="info-row"><span class="info-label">Auth</span><span class="info-value">JWT</span></div>
+              <div class="info-row"><span class="info-label">State</span><span class="info-value">Zustand + TanStack Query</span></div>
+              <div class="info-row"><span class="info-label">Integrity</span><span class="info-value">SHA-256 Hash-Chain</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Running Tests</div>
+              <div class="step-code" style="border-radius:8px;font-size:11px;"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Backend (coverage target > 90%)</span>
+cd backend && source .venv/bin/activate
+pytest
+
+<span class="c-gray"># Frontend</span>
+cd frontend
+npm test</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ TAXES PAGE ═══════════ -->
+    <div class="page" id="page-taxes" data-accent="amber">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">💶</div>
+            <div class="detail-hero-text">
+              <h1>Steuer-App</h1>
+              <p class="tagline">Personal tax management — track income, expenses, receipts, and export reports</p>
+              <div class="badge-row">
+                <span class="status-badge">Frontend :5175</span>
+                <span class="status-badge">Backend :8022</span>
+                <span class="tech-badge">FastAPI</span>
+                <span class="tech-badge">React</span>
+                <span class="tech-badge">SQLite</span>
+                <span class="tech-badge">Tailwind CSS</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">⚡</span>
+                <span class="note-text"><strong>One-command start:</strong> Use the included <code>start.sh</code> to launch both backend and frontend at once.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">Option A — One-command start</div>
+                      <div class="step-desc">Starts backend on :8022 and frontend on :5175 in one go</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/taxes
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Option B — Manual backend</div>
+                      <div class="step-desc">Set up a Python venv and start the FastAPI server manually</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/taxes/backend
+python3 -m venv .venv
+source .venv/bin/activate
+pip install -r requirements.txt
+uvicorn main:app --reload --port 8022</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Option B — Manual frontend</div>
+                      <div class="step-desc">Open a new terminal — Vite dev server proxies /api to :8022</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/taxes/frontend
+npm install
+npm run dev</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Features</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">📊</div>
+                  <div class="feature-text">
+                    <strong>Transaction Tracking</strong>
+                    <span>Log income and expenses with date, type, category, amount, and notes</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🧾</div>
+                  <div class="feature-text">
+                    <strong>Receipt Upload</strong>
+                    <span>Attach digital receipts (Belege) to transactions — stored locally under <code>taxes/belege/</code></span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📤</div>
+                  <div class="feature-text">
+                    <strong>CSV Export</strong>
+                    <span>Export filtered transactions as CSV for tax filing or spreadsheet import</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔍</div>
+                  <div class="feature-text">
+                    <strong>Filter & Search</strong>
+                    <span>Filter by year, month, category, or transaction type to find exactly what you need</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📱</div>
+                  <div class="feature-text">
+                    <strong>API Docs Built-in</strong>
+                    <span>Swagger UI at <code>localhost:8022/docs</code> — explore and test all endpoints interactively</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row"><span class="info-label">Live</span><span class="info-value"><a class="env-link" data-app="taxes" target="_blank">laholder.com ↗</a></span></div>
+              <div class="info-row"><span class="info-label">App</span><span class="info-value"><a href="http://localhost:5175" target="_blank">localhost:5175</a></span></div>
+              <div class="info-row"><span class="info-label">API</span><span class="info-value"><a href="http://localhost:8022" target="_blank">localhost:8022</a></span></div>
+              <div class="info-row"><span class="info-label">API Docs</span><span class="info-value"><a href="http://localhost:8022/docs" target="_blank">/docs</a></span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">FastAPI + Uvicorn</span></div>
+              <div class="info-row"><span class="info-label">Frontend</span><span class="info-value">React + Vite</span></div>
+              <div class="info-row"><span class="info-label">Database</span><span class="info-value">SQLite (steuern.db)</span></div>
+              <div class="info-row"><span class="info-label">Styling</span><span class="info-value">Tailwind CSS</span></div>
+              <div class="info-row"><span class="info-label">Start</span><span class="info-value">start.sh (both servers)</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Data Location</div>
+              <div class="info-row"><span class="info-label">Database</span><span class="info-value" style="font-size:10px;">taxes/steuern.db</span></div>
+              <div class="info-row"><span class="info-label">Receipts</span><span class="info-value" style="font-size:10px;">taxes/belege/</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ NPL PAGE ═══════════ -->
+    <div class="page" id="page-npl" data-accent="cyan">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">🌐</div>
+            <div class="detail-hero-text">
+              <h1>NPL Network</h1>
+              <p class="tagline">Self-hosted personal contact & relationship management API</p>
+              <div class="badge-row">
+                <span class="status-badge">API :8023</span>
+                <span class="tech-badge">FastAPI</span>
+                <span class="tech-badge">Async SQLAlchemy</span>
+                <span class="tech-badge">SQLite / PostgreSQL</span>
+                <span class="tech-badge">D3.js Graph</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-info">
+                <span class="note-icon">ℹ️</span>
+                <span class="note-text"><strong>API only — no dedicated frontend.</strong> Use the Swagger UI at <code>localhost:8023/docs</code> or connect any HTTP client.</span>
+              </div>
+
+              <div class="note note-warning">
+                <span class="note-icon">⚡</span>
+                <span class="note-text"><strong>One-command start:</strong> After the first-time setup below, use <code>start.sh</code> to start the backend.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">→</div>
+                    <div class="step-info">
+                      <div class="step-title">Subsequent runs — one-command start</div>
+                      <div class="step-desc">Starts the backend on :8023 in one go</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/npl
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">First-time: configure and install</div>
+                      <div class="step-desc">Create .env with a generated API key</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/npl
+cp .env.example .env
+
+<span class="c-gray"># Generate a secure API key and paste it into .env</span>
+python3 -c "import secrets; print(secrets.token_urlsafe(32))"
+
+python3 -m venv venv
+source venv/bin/activate
+pip install -r requirements.txt</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Initialize the database</div>
+                      <div class="step-desc">Creates all tables and seeds one example contact</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>mkdir -p app/data app/logs
+python3 database_init.py</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the server on port 8023</div>
+                      <div class="step-desc">Async FastAPI — all endpoints available immediately</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>uvicorn app.main:app --host 0.0.0.0 --port 8023</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                      <div class="step-title">Make your first API call</div>
+                      <div class="step-desc">All protected routes require the <code>X-API-Key</code> header</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Check health (no auth)</span>
+curl http://localhost:8023/api/health
+
+<span class="c-gray"># List contacts (requires API key)</span>
+curl -H "X-API-Key: YOUR_KEY" \
+  http://localhost:8023/api/entities</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">API Routes</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">👥</div>
+                  <div class="feature-text">
+                    <strong>Entities (Contacts)</strong>
+                    <span>Full CRUD — name, profession, city, rating 1–5, interests, notes, birth date, contact methods (email, phone, linkedin, instagram, twitter, website)</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔗</div>
+                  <div class="feature-text">
+                    <strong>Relationships</strong>
+                    <span>Directed graph edges — type (friend, colleague, mentor, …), strength 1–10, last interaction date, notes</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔍</div>
+                  <div class="feature-text">
+                    <strong>Full-Text Search</strong>
+                    <span><code>GET /api/search?q=term</code> — searches names, city, profession, notes, interests. Filter by city or profession.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📊</div>
+                  <div class="feature-text">
+                    <strong>Network Graph</strong>
+                    <span><code>GET /api/network-graph</code> → D3.js-ready <code>{nodes, edges}</code> payload for visualization</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📋</div>
+                  <div class="feature-text">
+                    <strong>Activity Log & Stats</strong>
+                    <span>Recent create/update/delete events and aggregate statistics across all contacts</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Raspberry Pi Deployment</div>
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">Create systemd service</div>
+                      <div class="step-desc">Auto-start on boot at <code>/etc/systemd/system/npl.service</code></div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>[Unit]
+Description=NPL Backend
+After=network.target
+
+[Service]
+User=pi
+WorkingDirectory=/home/pi/npl
+ExecStart=/home/pi/npl/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8023
+Restart=on-failure
+EnvironmentFile=/home/pi/npl/.env
+
+[Install]
+WantedBy=multi-user.target</div>
+                </div>
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Enable and start</div>
+                      <div class="step-desc">Follow logs with journalctl</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>sudo systemctl daemon-reload
+sudo systemctl enable npl
+sudo systemctl start npl
+sudo journalctl -u npl -f</div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row"><span class="info-label">API Base</span><span class="info-value"><a href="http://localhost:8023" target="_blank">localhost:8023</a></span></div>
+              <div class="info-row"><span class="info-label">API Docs</span><span class="info-value"><a href="http://localhost:8023/docs" target="_blank">/docs</a></span></div>
+              <div class="info-row"><span class="info-label">Health</span><span class="info-value"><a href="http://localhost:8023/api/health" target="_blank">/api/health</a></span></div>
+              <div class="info-row"><span class="info-label">Graph</span><span class="info-value">/api/network-graph</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">FastAPI async</span></div>
+              <div class="info-row"><span class="info-label">ORM</span><span class="info-value">SQLAlchemy (async)</span></div>
+              <div class="info-row"><span class="info-label">Database</span><span class="info-value">SQLite / PostgreSQL</span></div>
+              <div class="info-row"><span class="info-label">Auth</span><span class="info-value">X-API-Key header</span></div>
+              <div class="info-row"><span class="info-label">Pagination</span><span class="info-value">?page=&page_size=</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Auth Header</div>
+              <div class="step-code" style="border-radius:8px;font-size:11px;">X-API-Key: your_api_key</div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Running Tests</div>
+              <div class="step-code" style="border-radius:8px;font-size:11px;"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/npl
+source venv/bin/activate
+pytest tests/ -v</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ INVESTMENTS PAGE ═══════════ -->
+    <div class="page" id="page-investments" data-accent="emerald">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">📈</div>
+            <div class="detail-hero-text">
+              <h1>Market Analyzer</h1>
+              <p class="tagline">AI investment planner — runs 100% locally with Ollama. Free forever.</p>
+              <div class="badge-row">
+                <span class="status-badge">Frontend :5176</span>
+                <span class="tech-badge">Ollama LLM</span>
+                <span class="tech-badge">React</span>
+                <span class="tech-badge">Recharts</span>
+                <span class="tech-badge">Tailwind CSS</span>
+                <span class="tech-badge">No Backend</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">🤖</span>
+                <span class="note-text"><strong>Requires Ollama.</strong> Install it first — the LLM runs entirely on your machine. No API key needed for inference.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">→</div>
+                    <div class="step-info">
+                      <div class="step-title">Subsequent runs — one-command start</div>
+                      <div class="step-desc">Starts the Vite dev server on :5176 (make sure Ollama is running separately)</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/investments
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">First-time: install Ollama</div>
+                      <div class="step-desc">One-liner for Linux/WSL2. Download installer for Windows/Mac from ollama.com.</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Linux / WSL2</span>
+curl -fsSL https://ollama.com/install.sh | sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Pull a model</div>
+                      <div class="step-desc">Choose based on your available RAM — qwen2.5:7b recommended for most systems</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>ollama pull qwen2.5:7b    <span class="c-gray"># 4.4 GB — needs 8 GB RAM (recommended)</span>
+ollama pull qwen2.5:14b   <span class="c-gray"># 8.4 GB — needs 16 GB RAM</span>
+ollama pull qwen2.5:32b   <span class="c-gray"># 19 GB  — needs 32 GB RAM</span></div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Start Ollama — keep this terminal open</div>
+                      <div class="step-desc">Must be running before you use the app. Use the remote-access variant if deployed behind a domain.</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Local use (Linux / WSL2)</span>
+OLLAMA_ORIGINS="*" ollama serve
+
+<span class="c-gray"># Remote access (deployed to a domain)</span>
+OLLAMA_ORIGINS="https://yourdomain.com" OLLAMA_HOST="0.0.0.0" ollama serve</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                      <div class="step-title">Add optional API keys for live market data</div>
+                      <div class="step-desc">The app works without these — live benchmark prices just won't be injected into the AI prompt</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/investments
+cp .env.example .env.local   <span class="c-gray"># or create manually</span>
+
+<span class="c-gray"># Edit .env.local and fill in what you have:</span>
+VITE_ALPHA_VANTAGE_KEY=YOUR_KEY   <span class="c-gray"># alphavantage.co (free tier)</span>
+VITE_COINGECKO_KEY=YOUR_KEY       <span class="c-gray"># coingecko.com (free tier)</span>
+VITE_FRED_KEY=YOUR_KEY            <span class="c-gray"># fred.stlouisfed.org (free)</span></div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">5</div>
+                    <div class="step-info">
+                      <div class="step-title">Start the app on port 5176</div>
+                      <div class="step-desc">Make sure Ollama is running before clicking "Create Investment Plan"</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/investments
+npm install
+npm run dev</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Data Sources</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">🤖</div>
+                  <div class="feature-text">
+                    <strong>Ollama (Local LLM)</strong>
+                    <span>Generates the full portfolio plan. Default model: <code>qwen2.5:7b</code>. Override via <code>VITE_OLLAMA_MODEL</code> in <code>.env.local</code>.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🪙</div>
+                  <div class="feature-text">
+                    <strong>CoinGecko</strong>
+                    <span>Live crypto benchmark prices — current price, 24h/7d change, market cap, volume. Free tier available.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📉</div>
+                  <div class="feature-text">
+                    <strong>Alpha Vantage</strong>
+                    <span>Live stock/ETF benchmark prices, P/E ratio, 52-week range, sector data. Falls back to AI-only mode if rate limit hit.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🏦</div>
+                  <div class="feature-text">
+                    <strong>FRED (Federal Reserve)</strong>
+                    <span>US macro data: CPI inflation, Fed Funds rate, unemployment. Enriches every plan with real economic context.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row"><span class="info-label">Live</span><span class="info-value"><a class="env-link" data-app="investments" target="_blank">laholder.com ↗</a></span></div>
+              <div class="info-row"><span class="info-label">App</span><span class="info-value"><a href="http://localhost:5176" target="_blank">localhost:5176</a></span></div>
+              <div class="info-row"><span class="info-label">Ollama</span><span class="info-value">localhost:11434</span></div>
+              <div class="info-row"><span class="info-label">How-To</span><span class="info-value"><a href="../investments/how-to.html" target="_blank">how-to.html</a></span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">UI</span><span class="info-value">React + Vite</span></div>
+              <div class="info-row"><span class="info-label">Charts</span><span class="info-value">Recharts + lightweight-charts</span></div>
+              <div class="info-row"><span class="info-label">AI</span><span class="info-value">Ollama (local)</span></div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">None — browser only</span></div>
+              <div class="info-row"><span class="info-label">Icons</span><span class="info-value">lucide-react</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Model Tips</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.7;padding-top:4px;">
+                <div><span class="c-green">●</span> 8 GB RAM → <code>qwen2.5:7b</code></div>
+                <div><span class="c-blue">●</span> 16 GB RAM → <code>qwen2.5:14b</code></div>
+                <div><span class="c-yellow">●</span> 32 GB RAM → <code>qwen2.5:32b</code></div>
+                <div style="margin-top:8px;color:var(--dim);">Override model in <code>.env.local</code>:<br><code>VITE_OLLAMA_MODEL=qwen2.5:14b</code></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ═══════════ AI CAM PAGE ═══════════ -->
+    <div class="page" id="page-aicam" data-accent="blue">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">🎥</div>
+            <div class="detail-hero-text">
+              <h1>AI Cam</h1>
+              <p class="tagline">Real-time object detection & hand gesture recognition — runs 100% locally</p>
+              <div class="badge-row">
+                <span class="status-badge">Desktop App</span>
+                <span class="tech-badge">Python 3.13</span>
+                <span class="tech-badge">OpenCV</span>
+                <span class="tech-badge">YOLOv8</span>
+                <span class="tech-badge">MediaPipe</span>
+                <span class="tech-badge">uv</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">⚡</span>
+                <span class="note-text"><strong>One-command start:</strong> Use <code>start.sh</code> — it manages the venv via <code>uv</code> automatically.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">Option A — One-command start</div>
+                      <div class="step-desc">Installs dependencies via uv and launches the app with the model-selection menu</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/ai_cam
+bash start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Option B — Manual run</div>
+                      <div class="step-desc">Install with uv and run directly</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/ai_cam
+uv sync
+uv run python main.py</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Select models in the start menu</div>
+                      <div class="step-desc">A fullscreen GUI appears — check the models you want and click START</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># Menu controls</span>
+SPACE / Click  → toggle model checkbox
+ENTER / START  → launch with selected models
+ESC  / QUIT    → exit</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">4</div>
+                    <div class="step-info">
+                      <div class="step-title">Runtime controls</div>
+                      <div class="step-desc">Models auto-download on first run (~6 MB each)</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button><span class="c-gray"># While the camera feed is running</span>
+Q → quit application</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">AI Models</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">✋</div>
+                  <div class="feature-text">
+                    <strong>Hand Gesture Recognition (MediaPipe)</strong>
+                    <span>Recognizes 7 gestures in real time: 👍 Thumbs Up, 👎 Thumbs Down, ✋ Open Palm, ✊ Closed Fist, ✌️ Victory, 🤟 ILoveYou, ☝️ Pointing Up</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔍</div>
+                  <div class="feature-text">
+                    <strong>YOLO Object Detection (YOLOv8 Nano)</strong>
+                    <span>Fast, accurate bounding boxes with confidence scores for 80 COCO classes. Confidence threshold: 0.4 (configurable)</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Features</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">🖥️</div>
+                  <div class="feature-text">
+                    <strong>Fullscreen Start Menu</strong>
+                    <span>Fancy OpenCV GUI with mouse + keyboard navigation — select which models to run before launch</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">📷</div>
+                  <div class="feature-text">
+                    <strong>Camera Auto-Selection</strong>
+                    <span>Tries preferred camera index first (default: 1), falls back to index 0 if unavailable</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">⚙️</div>
+                  <div class="feature-text">
+                    <strong>Centralized Config</strong>
+                    <span>All settings in <code>config.py</code> — resolution (up to 4K), FPS, bbox colors, confidence thresholds, logging</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔌</div>
+                  <div class="feature-text">
+                    <strong>Pluggable Model Architecture</strong>
+                    <span>Add new models by implementing the adapter interface and registering in <code>ai_model_store.py</code></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">Architecture</div>
+              <div class="arch-tree"><span class="dir">ai_cam/</span>
+├── <span class="file">main.py</span>                       <span class="comment"># Entry point — menu + runtime loop</span>
+├── <span class="file">config.py</span>                     <span class="comment"># All settings (camera, display, models)</span>
+├── <span class="file">ai_model_store.py</span>             <span class="comment"># Model registry and factory</span>
+├── <span class="file">model_adapter_interface.py</span>    <span class="comment"># Base class for adapters</span>
+├── <span class="file">yolo_adapter.py</span>               <span class="comment"># YOLOv8 detection adapter</span>
+├── <span class="file">gesture_recogintion_adapter.py</span> <span class="comment"># MediaPipe gesture adapter</span>
+├── <span class="file">yolov8n.pt</span>                    <span class="comment"># YOLOv8 nano weights</span>
+├── <span class="dir">models/</span>                        <span class="comment"># gesture_recognizer.task (auto-downloaded)</span>
+├── <span class="file">start.sh</span>                      <span class="comment"># One-command start via uv</span>
+├── <span class="file">pyproject.toml</span>                <span class="comment"># uv project config</span>
+└── <span class="dir">playground/</span>                    <span class="comment"># Experimental scripts</span></div>
+            </div>
+          </div>
+
+          <!-- SIDEBAR -->
+          <div>
+            <div class="widget">
+              <div class="widget-title">Run</div>
+              <div class="info-row">
+                <span class="info-label">Start</span>
+                <span class="info-value" style="font-size:11px;">bash ~/ai_cam/start.sh</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Type</span>
+                <span class="info-value">Desktop (OpenCV)</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">Models dir</span>
+                <span class="info-value" style="font-size:11px;">ai_cam/models/</span>
+              </div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">Runtime</span><span class="info-value">Python 3.13 + uv</span></div>
+              <div class="info-row"><span class="info-label">Video</span><span class="info-value">OpenCV 4.12</span></div>
+              <div class="info-row"><span class="info-label">Detection</span><span class="info-value">Ultralytics YOLOv8</span></div>
+              <div class="info-row"><span class="info-label">Gestures</span><span class="info-value">MediaPipe 0.10</span></div>
+              <div class="info-row"><span class="info-label">Tensor</span><span class="info-value">PyTorch 2.9</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Model Downloads</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.7;padding-top:4px;">
+                <div><span class="c-blue">●</span> MediaPipe gesture model — ~6.2 MB</div>
+                <div><span class="c-blue">●</span> YOLOv8 nano weights — ~6.2 MB</div>
+                <div style="margin-top:8px;color:var(--dim);">Auto-downloaded on first run and cached in <code>models/</code></div>
+              </div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Config Tips</div>
+              <div class="step-code" style="border-radius:8px;font-size:11px;"><span class="c-gray"># config.py quick edits</span>
+CAMERA["preferred_index"] = 0  <span class="c-gray"># switch camera</span>
+CAMERA["resolution"]["width"] = 1280  <span class="c-gray"># lower res</span>
+MODELS["yolo"]["enabled"] = False  <span class="c-gray"># YOLO off</span>
+LOGGING["log_detections"] = True  <span class="c-gray"># verbose</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  // ── Environment detection ────────────────────────────────────────────────
+  const isLive = !['localhost', '127.0.0.1', ''].includes(window.location.hostname);
+
+  const APP_URLS = {
+    maklermatch: { local: 'http://localhost:5173', live: 'https://laholder.com/Apps/Maklermatch/' },
+    votesemble:  { local: 'http://localhost:5174', live: 'https://laholder.com/Apps/Votesemble/' },
+    taxes:       { local: 'http://localhost:5175', live: 'https://laholder.com/Apps/Taxes/' },
+    investments: { local: 'http://localhost:5176', live: 'https://laholder.com/Apps/MarketAnalyzer/' },
+  };
+
+  function openApp(name, e) {
+    e.stopPropagation();
+    const urls = APP_URLS[name];
+    if (urls) window.open(isLive ? urls.live : urls.local, '_blank');
+  }
+
+  // ── Page navigation ──────────────────────────────────────────────────────
+  const pages = ['overview', 'maklermatch', 'votesemble', 'taxes', 'npl', 'investments', 'aicam'];
+
+  function navigate(target) {
+    pages.forEach(id => {
+      const page = document.getElementById('page-' + id);
+      const nav  = document.getElementById('nav-' + id);
+      if (page) page.classList.toggle('active', id === target);
+      if (nav)  nav.classList.toggle('active',  id === target);
+    });
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+
+  function copyCode(btn) {
+    const block = btn.closest('.step-code');
+    const text = block.innerText
+      .replace(/^Copy\n?/, '')
+      .trim();
+    navigator.clipboard.writeText(text).then(() => {
+      btn.textContent = 'Copied!';
+      btn.classList.add('copied');
+      setTimeout(() => {
+        btn.textContent = 'Copy';
+        btn.classList.remove('copied');
+      }, 2000);
+    });
+  }
+
+  // ── Apply environment-aware links on load ────────────────────────────────
+  document.addEventListener('DOMContentLoaded', () => {
+    // Update card open-buttons text
+    document.querySelectorAll('.live-link').forEach(el => {
+      el.textContent = isLive ? '↗ Live' : '↗ Open';
+    });
+
+    // Update widget env-links (href + label)
+    document.querySelectorAll('.env-link').forEach(el => {
+      const app = el.dataset.app;
+      const urls = APP_URLS[app];
+      if (!urls) return;
+      el.href = isLive ? urls.live : urls.local;
+      el.textContent = isLive
+        ? 'laholder.com ↗'
+        : urls.local.replace('http://', '') + ' ↗';
+    });
+
+    // Header badge
+    const badge = document.querySelector('.header-badge');
+    if (badge) badge.textContent = isLive
+      ? '6 Apps · laholder.com'
+      : '6 Apps · Luca\'s Local Collection';
+  });
+</script>
+</body>
+</html>
