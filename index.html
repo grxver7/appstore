@@ -583,6 +583,12 @@
       <div class="nav-dot" style="background:var(--blue);"></div>
     </div>
 
+    <div class="nav-item" id="nav-hummatch" onclick="navigate('hummatch')">
+      <div class="nav-icon" style="background:var(--purple-d);">🎵</div>
+      HumMatch
+      <div class="nav-dot" style="background:var(--purple);"></div>
+    </div>
+
     <div class="sidebar-section-label" style="margin-top:8px;">Port Map</div>
     <div style="padding: 4px 10px;">
       <div style="font-size:11px;color:var(--dim);line-height:2;font-family:ui-monospace,monospace;">
@@ -592,6 +598,7 @@
         <div><span style="color:var(--cyan)">●</span> NPL &nbsp;→ :8023</div>
         <div><span style="color:var(--emerald)">●</span> Mkt &nbsp;→ :5176</div>
         <div><span style="color:var(--blue)">●</span> Cam &nbsp;→ desktop</div>
+        <div><span style="color:var(--purple)">●</span> Hum → :5177 / :8030</div>
       </div>
     </div>
 
@@ -754,6 +761,33 @@
                 <span class="port-badge">desktop</span>
               </div>
               <div class="open-btn">View details →</div>
+            </div>
+          </div>
+
+          <!-- HumMatch -->
+          <div class="app-card" data-accent="purple" onclick="navigate('hummatch')">
+            <div class="app-card-header">
+              <div class="app-icon">🎵</div>
+              <div>
+                <div class="app-card-title">HumMatch</div>
+                <div class="app-card-subtitle">Hum-to-Song Recognition</div>
+              </div>
+            </div>
+            <div class="tag-row">
+              <span class="tag" style="background:rgba(139,92,246,0.1);color:#8b5cf6;">ACRCloud</span>
+              <span class="tag" style="background:rgba(59,130,246,0.1);color:#60a5fa;">React</span>
+              <span class="tag" style="background:rgba(16,185,129,0.1);color:#10b981;">FastAPI</span>
+            </div>
+            <p class="app-card-desc">Hum or sing a melody — HumMatch identifies the song. Uses ACRCloud's humming recognition (melody-contour matching, not fingerprinting). Ranked results with confidence scores.</p>
+            <div class="app-card-footer">
+              <div class="port-badges">
+                <span class="port-badge">:5177</span>
+                <span class="port-badge">:8030</span>
+              </div>
+              <div style="display:flex;align-items:center;gap:12px;">
+                <a class="live-link" onclick="openApp('hummatch', event)">↗ Open</a>
+                <div class="open-btn">Details →</div>
+              </div>
             </div>
           </div>
 
@@ -1993,6 +2027,162 @@ LOGGING["log_detections"] = True  <span class="c-gray"># verbose</span></div>
       </div>
     </div>
 
+    <!-- ═══════════ HUMMATCH PAGE ═══════════ -->
+    <div class="page" id="page-hummatch" data-accent="purple">
+      <div class="app-detail">
+        <div class="detail-hero">
+          <div class="detail-hero-bg"></div>
+          <div class="detail-hero-inner">
+            <div class="detail-icon">🎵</div>
+            <div class="detail-hero-text">
+              <h1>HumMatch</h1>
+              <p class="tagline">Hum or sing a melody — identify the song. Melody-contour matching, not audio fingerprinting.</p>
+              <div class="badge-row">
+                <span class="status-badge">Frontend :5177</span>
+                <span class="status-badge">API :8030</span>
+                <span class="tech-badge">ACRCloud</span>
+                <span class="tech-badge">React + Vite</span>
+                <span class="tech-badge">FastAPI</span>
+                <span class="tech-badge">SQLite</span>
+                <span class="tech-badge">Framer Motion</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="content-body">
+          <div>
+            <div class="section">
+              <div class="section-title">Quick Start</div>
+
+              <div class="note note-warning">
+                <span class="note-icon">🔑</span>
+                <span class="note-text"><strong>Requires ACRCloud credentials.</strong> Create a <strong>Humming Recognition</strong> project (not Audio Fingerprint) at <code>console.acrcloud.com</code> and paste the Host / Key / Secret into <code>backend/.env</code>.</span>
+              </div>
+
+              <div class="step-list">
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">→</div>
+                    <div class="step-info">
+                      <div class="step-title">Subsequent runs — one command</div>
+                      <div class="step-desc">Starts both backend (:8030) and frontend (:5177)</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/hummatch
+./start.sh</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">1</div>
+                    <div class="step-info">
+                      <div class="step-title">Set up the Python venv</div>
+                      <div class="step-desc">Uses Python 3.12 — not the system default</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/hummatch/backend
+python3.12 -m venv .venv
+.venv/bin/pip install -r requirements.txt</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">2</div>
+                    <div class="step-info">
+                      <div class="step-title">Add ACRCloud credentials to .env</div>
+                      <div class="step-desc">Copy the example file and fill in your Humming Recognition project details</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/hummatch
+cp .env.example backend/.env
+<span class="c-gray"># Edit backend/.env:</span>
+ACRCLOUD_HOST=identify-eu-west-1.acrcloud.com
+ACRCLOUD_ACCESS_KEY=your_key
+ACRCLOUD_ACCESS_SECRET=your_secret</div>
+                </div>
+
+                <div class="step">
+                  <div class="step-header">
+                    <div class="step-num">3</div>
+                    <div class="step-info">
+                      <div class="step-title">Install frontend dependencies</div>
+                    </div>
+                  </div>
+                  <div class="step-code"><button class="copy-btn" onclick="copyCode(this)">Copy</button>cd ~/apps/hummatch/frontend
+npm install</div>
+                </div>
+              </div>
+            </div>
+
+            <div class="section">
+              <div class="section-title">How It Works</div>
+              <div class="feature-list">
+                <div class="feature-item">
+                  <div class="feature-icon">🎤</div>
+                  <div class="feature-text">
+                    <strong>Record 5–12 seconds</strong>
+                    <span>Tap the button and hum or sing any part of the melody. The browser validates duration and volume before uploading — no wasted API calls on silence.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🌊</div>
+                  <div class="feature-text">
+                    <strong>Real-time waveform</strong>
+                    <span>32 bars driven by the Web Audio API AnalyserNode during recording — shows the mic is actually picking up sound.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🎯</div>
+                  <div class="feature-text">
+                    <strong>Ranked results with confidence</strong>
+                    <span>Returns up to 5 candidates sorted by match score. Below 60% confidence, shows a "Not sure" state instead of pretending certainty.</span>
+                  </div>
+                </div>
+                <div class="feature-item">
+                  <div class="feature-icon">🔌</div>
+                  <div class="feature-text">
+                    <strong>Swappable engine interface</strong>
+                    <span><code>MatchEngine</code> ABC in <code>match_engine/base.py</code> — swap ACRCloud for another provider without touching the rest of the app. Audd.io stub already included.</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <div class="widget">
+              <div class="widget-title">Endpoints</div>
+              <div class="info-row"><span class="info-label">App</span><span class="info-value"><a href="http://localhost:5177" target="_blank">localhost:5177</a></span></div>
+              <div class="info-row"><span class="info-label">API</span><span class="info-value"><a href="http://localhost:8030" target="_blank">localhost:8030</a></span></div>
+              <div class="info-row"><span class="info-label">API Docs</span><span class="info-value"><a href="http://localhost:8030/docs" target="_blank">/docs</a></span></div>
+              <div class="info-row"><span class="info-label">Health</span><span class="info-value"><a href="http://localhost:8030/api/health" target="_blank">/api/health</a></span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">Stack</div>
+              <div class="info-row"><span class="info-label">UI</span><span class="info-value">React + Vite + TypeScript</span></div>
+              <div class="info-row"><span class="info-label">Styling</span><span class="info-value">Tailwind CSS + Framer Motion</span></div>
+              <div class="info-row"><span class="info-label">State</span><span class="info-value">Zustand + React Query</span></div>
+              <div class="info-row"><span class="info-label">Backend</span><span class="info-value">FastAPI + SQLAlchemy</span></div>
+              <div class="info-row"><span class="info-label">DB</span><span class="info-value">SQLite</span></div>
+              <div class="info-row"><span class="info-label">Auth</span><span class="info-value">JWT (email + password)</span></div>
+              <div class="info-row"><span class="info-label">Recognition</span><span class="info-value">ACRCloud Humming API</span></div>
+            </div>
+            <div class="widget">
+              <div class="widget-title">API Routes</div>
+              <div style="font-size:12px;color:var(--muted);line-height:1.9;padding-top:4px;font-family:ui-monospace,monospace;">
+                <div><span class="c-green">POST</span> /api/recognize</div>
+                <div><span class="c-blue">GET</span>&nbsp; /api/history</div>
+                <div><span class="c-green">POST</span> /api/history/{id}/feedback</div>
+                <div><span class="c-green">POST</span> /api/auth/register</div>
+                <div><span class="c-green">POST</span> /api/auth/login</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </main>
 </div>
 
@@ -2005,6 +2195,7 @@ LOGGING["log_detections"] = True  <span class="c-gray"># verbose</span></div>
     votesemble:  { local: 'http://localhost:5174', live: 'https://laholder.com/Apps/Votesemble/' },
     taxes:       { local: 'http://localhost:5175', live: 'https://laholder.com/Apps/Taxes/' },
     investments: { local: 'http://localhost:5176', live: 'https://laholder.com/Apps/MarketAnalyzer/' },
+    hummatch:    { local: 'http://localhost:5177', live: 'https://laholder.com/Apps/HumMatch/' },
   };
 
   function openApp(name, e) {
@@ -2014,7 +2205,7 @@ LOGGING["log_detections"] = True  <span class="c-gray"># verbose</span></div>
   }
 
   // ── Page navigation ──────────────────────────────────────────────────────
-  const pages = ['overview', 'maklermatch', 'votesemble', 'taxes', 'npl', 'investments', 'aicam'];
+  const pages = ['overview', 'maklermatch', 'votesemble', 'taxes', 'npl', 'investments', 'aicam', 'hummatch'];
 
   function navigate(target) {
     pages.forEach(id => {
@@ -2062,8 +2253,8 @@ LOGGING["log_detections"] = True  <span class="c-gray"># verbose</span></div>
     // Header badge
     const badge = document.querySelector('.header-badge');
     if (badge) badge.textContent = isLive
-      ? '6 Apps · laholder.com'
-      : '6 Apps · Luca\'s Local Collection';
+      ? '7 Apps · laholder.com'
+      : '7 Apps · Luca\'s Local Collection';
   });
 </script>
 </body>
